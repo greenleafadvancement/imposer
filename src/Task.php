@@ -11,6 +11,7 @@ class Task {
 
 	protected $name, $tries=0, $scheduled=false;
 	protected $dependsOn, $reads=array(), $steps, $blocker;
+	protected $scheduler;
 
 	function __construct($name, $scheduler) {
 		$this->name = $name;

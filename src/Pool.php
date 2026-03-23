@@ -14,6 +14,7 @@ class Pool extends \ArrayObject {
 		return $this->offsetExists($name);
 	}
 
+	#[\ReturnTypeWillChange]
 	function offsetGet($name) {
 		if ( ! $this->offsetExists($name) ) {
 			$factory = $this->factory;

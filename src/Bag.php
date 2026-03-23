@@ -29,6 +29,7 @@ class Bag extends \ArrayObject {
 	}
 
 	/* Allow unset of non-existing offset */
+	#[\ReturnTypeWillChange]
 	function offsetUnset($name) {
 		return $this->offsetExists($name) ? parent::offsetUnset($name) : null;
 	}
