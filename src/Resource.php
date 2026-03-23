@@ -136,7 +136,7 @@ class Resource extends Task {
 			if ( $pending->has($k) ) {
 				$p = $pending[$k];
 				unset($pending[$k]);
-				if ( ! GP\is_settled($p) ) $p->resolve($v);
+				if ( ! GP\Is::settled($p) ) $p->resolve($v);
 			}
 		}
 		if ( ! $pending->count() ) unset($this->pending[$keyType]);

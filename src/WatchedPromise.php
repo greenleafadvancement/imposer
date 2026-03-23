@@ -14,7 +14,7 @@ class WatchedPromise implements GP\PromiseInterface {
 	protected $promise, $handler, $checked=false;
 
 	function __construct($promiseOrValue=null, callable $handler=null) {
-		$this->promise = func_num_args() ? GP\promise_for($promiseOrValue) : new GP\Promise();
+		$this->promise = func_num_args() ? GP\Create::promiseFor($promiseOrValue) : new GP\Promise();
 		$handler = $handler ?: 'dirtsimple\imposer\Promise::deferred_throw';
 		if ($this->handler = $handler) $this->promise->otherwise(
 			function($reason) use($handler) {
@@ -38,7 +38,7 @@ class WatchedPromise implements GP\PromiseInterface {
 			if ($val instanceof \Generator) return $this->spawn($val);
 			$val = Promise::interpret( $val );
 			if ($val instanceof PromiseInterface) {
-				if ( $val->getState() === self::REJECTED ) $this->reject( GP\inspect($val)['reason'] );
+				if ( $val->getState() === self::REJECTED ) $this->reject( GP\Utils::inspect($val)['reason'] );
 				else $val->then( array($this,'resolve'), array($this,'reject') );
 			} else {
 				$this->resolve($val);
@@ -64,11 +64,11 @@ class WatchedPromise implements GP\PromiseInterface {
 					if ( ! $val instanceof PromiseInterface ) {
 						$fn = $send;  $in = $val;
 					} else if ( $val->getState() === PromiseInterface::REJECTED ) {
-						$fn = $throw; $in = GP\exception_for( GP\inspect($val)['reason'] );
+						$fn = $throw; $in = GP\Create::exceptionFor( GP\Utils::inspect($val)['reason'] );
 					} else {
 						$val->then(
 							function($val) use($run, $send)  { $run( $send, $val ); },
-							function($err) use($run, $throw) { $run( $throw, GP\exception_for($err) ); }
+							function($err) use($run, $throw) { $run( $throw, GP\Create::exceptionFor($err) ); }
 						);
 						return;
 					}

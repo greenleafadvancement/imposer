@@ -7,7 +7,7 @@ use GuzzleHttp\Promise\PromiseInterface;
 class Promise {
 	# Return watched promise for a value/promise or error
 	static function value($val) { return WatchedPromise::wrap($val); }
-	static function error($reason) { return new WatchedPromise( GP\rejection_for($reason) ); }
+	static function error($reason) { return new WatchedPromise( GP\Create::rejectionFor($reason) ); }
 
 	# Synchronously return a value or throw an error; return default if pending
 	static function now($val, $default=null) {
@@ -39,7 +39,7 @@ class Promise {
 						return $v;
 				}
 			}
-			return $all ? new WatchedPromise( GP\all($data) ) : $data;
+			return $all ? new WatchedPromise( GP\Utils::all($data) ) : $data;
 		} else return $data;
 	}
 
@@ -54,17 +54,17 @@ class Promise {
 
 	# Default handler for watched promises
 	static function deferred_throw($reason) {
-		GP\queue()->add(function() use ($reason) { throw GP\exception_for($reason); });
+		GP\Utils::queue()->add(function() use ($reason) { throw GP\Create::exceptionFor($reason); });
 	}
 
 	# Guzzle wrappers and async utils
 	static function sync() {
-		GP\queue()->run();
+		GP\Utils::queue()->run();
 	}
 
 	static function later($cb, ...$args) {
 		if ($args) $cb = function () use ($cb, $args) { $cb(...$args); };
-		GP\queue()->add($cb);
+		GP\Utils::queue()->add($cb);
 	}
 
 }
