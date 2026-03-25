@@ -15,8 +15,8 @@ class MenuItem {
 	protected string $xfn;
 	protected string $type = '';
 	protected string $url = '';
-	protected string $object = '';
-	protected int $object_id = 0;
+	protected ?string $object = null;
+	protected ?int $object_id = null;
 	protected string $guid = '';
 
 	function __construct($menu, $item, $parent=0, $position=0) {
@@ -58,7 +58,8 @@ class MenuItem {
 
 	protected function page($page, $item) {
 		$post = yield Imposer::ref('@wp-post', $page);
-		$this->object = $post_type = get_post($post)->post_type;
+		$post_obj = get_post($post);
+		$this->object = $post_obj ? $post_obj->post_type : 'post';
 		$this->object_id = $post;
 		$this->type = 'post_type';
 		yield get($item->id, "page:$post_type:$post");
