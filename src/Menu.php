@@ -4,6 +4,14 @@ use WP_CLI;
 
 class Menu {
 
+	protected int $term_id;
+	protected string $name;
+	protected string $description;
+	protected array $items;
+	protected array $location_map = [];
+	protected int $item_count = 0;
+	protected ?object $old_items = null;
+
 	static function build_menus($menus) {
 		// Get all exising menus, indexed by name
 		$oldMenus = array_column( wp_get_nav_menus(), null, 'name' );
@@ -108,5 +116,3 @@ class Menu {
 		}
 	}
 }
-
-

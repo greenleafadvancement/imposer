@@ -4,6 +4,21 @@ use WP_CLI;
 
 class MenuItem {
 
+	protected int $menu;
+	protected int $parent_id;
+	protected int $position;
+	protected string $title;
+	protected string $description;
+	protected string $attr_title;
+	protected string $target;
+	protected string $classes;
+	protected string $xfn;
+	protected string $type = '';
+	protected string $url = '';
+	protected string $object = '';
+	protected int $object_id = 0;
+	protected string $guid = '';
+
 	function __construct($menu, $item, $parent=0, $position=0) {
 		$this->menu        = $menu;
 		$this->parent_id   = $parent;
@@ -96,8 +111,8 @@ class MenuItem {
 			$this->xfn         !== $old->xfn                    ||
 
 			( $this->type == 'custom' && $this->url       !== $old->url )             ||
-			( isset($this->object)    && $this->object    !== $old->object )          ||
-			( isset($this->object_id) && $this->object_id !== (int) $old->object_id ) ||
+			( $this->object !== ''    && $this->object    !== $old->object )          ||
+			( $this->object_id !== 0  && $this->object_id !== (int) $old->object_id ) ||
 			( $this->title !== ''     && $this->title     !== $old->title )           ||
 
 			$old->classes !== array_map( 'sanitize_html_class', explode( ' ', $this->classes ) ) ||
@@ -107,20 +122,19 @@ class MenuItem {
 
 	protected function sync_args() {
 		return array(
-			'menu-item-object-id'   => get($this->object_id, 0),
-			'menu-item-object'      => get($this->object, ''),
+			'menu-item-object-id'   => $this->object_id ?: 0,
+			'menu-item-object'      => $this->object ?: '',
 			'menu-item-parent-id'   => $this->parent_id,
 			'menu-item-position'    => $this->position,
 			'menu-item-type'        => $this->type,
 			'menu-item-title'       => wp_slash($this->title),
-			'menu-item-url'         => get($this->url, ''),
+			'menu-item-url'         => $this->url ?: '',
 			'menu-item-description' => wp_slash($this->description),
 			'menu-item-attr-title'  => wp_slash($this->attr_title),
-			'menu-item-target'      => get($this->target, ''),
-			'menu-item-classes'     => get($this->classes, ''),
-			'menu-item-xfn'         => get($this->xfn, ''),
+			'menu-item-target'      => $this->target ?: '',
+			'menu-item-classes'     => $this->classes ?: '',
+			'menu-item-xfn'         => $this->xfn ?: '',
 			'menu-item-status'      => 'publish',
 		);
 	}
 }
-

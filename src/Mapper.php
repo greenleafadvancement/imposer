@@ -5,7 +5,8 @@ class Mapper implements \ArrayAccess, \IteratorAggregate, \Countable {
 
 	/* I serialize the application of models, proxying a new one for each apply() */
 
-	private $model, $lastSave=null;
+	private $model;
+	private ?WatchedPromise $lastSave = null;
 
 	function __construct($model) { $this->model = $model; }
 	function implements($cls) { return $this->model instanceof $cls; }
@@ -37,10 +38,22 @@ class Mapper implements \ArrayAccess, \IteratorAggregate, \Countable {
 	function __get($k) { return $this->model->$k; }
 	function __isset($k)  { return isset($this->model->$k); }
 	function __unset($k)  { unset($this->model->$k); }
+
+	#[\ReturnTypeWillChange]
 	function offsetGet($k) { return $this->model[$k]; }
+
+	#[\ReturnTypeWillChange]
 	function offsetSet($k,$v) { $this->model[$k] = $v; }
+
+	#[\ReturnTypeWillChange]
 	function offsetExists($k) { return $this->model->offsetExists($k); }
+
+	#[\ReturnTypeWillChange]
 	function offsetUnset($k) { $this->model->offsetUnset($k); }
+
+	#[\ReturnTypeWillChange]
 	function getIterator() { return $this->model->getIterator(); }
+
+	#[\ReturnTypeWillChange]
 	function count() { return $this->model->count(); }
 }

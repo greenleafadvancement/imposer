@@ -15,6 +15,11 @@ class WatchedPromise implements GP\PromiseInterface {
 	protected $handler;
 	protected bool $checked = false;
 
+	// Set by Resource when creating pending references
+	public $key;
+	public $keyType;
+	public $resource;
+
 	function __construct($promiseOrValue=null, ?callable $handler=null) {
 		$this->promise = func_num_args() ? GP\Create::promiseFor($promiseOrValue) : new GP\Promise();
 		$handler = $handler ?: 'dirtsimple\imposer\Promise::deferred_throw';
