@@ -7,13 +7,15 @@ use GuzzleHttp\Promise\PromiseInterface;
 
 class WatchedPromise implements GP\PromiseInterface {
 
-	/*  A Promise wrapper that invokes a hnadler for rejections of leaf promises
+	/*  A Promise wrapper that invokes a handler for rejections of leaf promises
 	 *  (i.e., those with no handlers and which have not been unwrapped)
 	 */
 
-	protected $promise, $handler, $checked=false;
+	protected $promise;
+	protected $handler;
+	protected bool $checked = false;
 
-	function __construct($promiseOrValue=null, callable $handler=null) {
+	function __construct($promiseOrValue=null, ?callable $handler=null) {
 		$this->promise = func_num_args() ? GP\Create::promiseFor($promiseOrValue) : new GP\Promise();
 		$handler = $handler ?: 'dirtsimple\imposer\Promise::deferred_throw';
 		if ($this->handler = $handler) $this->promise->otherwise(
@@ -24,7 +26,7 @@ class WatchedPromise implements GP\PromiseInterface {
 	}
 
 	/* Factory that avoids duplicating wrappers with the same handler */
-	static function wrap($data, $handler=null) {
+	static function wrap($data, ?callable $handler=null) {
 		$handler = $handler ?: 'dirtsimple\imposer\Promise::deferred_throw';
 		return ( $data instanceof static  && $data->handler === $handler ) ? $data : new static($data, $handler);
 	}
@@ -89,22 +91,22 @@ class WatchedPromise implements GP\PromiseInterface {
 		return $this;
 	}
 
-	function wait($unwrap=true) {
+	function wait(bool $unwrap=true) {
 		# Synchronous inspection throws upon rejection, so consider ourselves checked
 		if ($unwrap) $this->checked = true;
 		return $this->promise->wait($unwrap);
 	}
 
-	function then(callable $onFulfilled=null, callable $onRejected=null) {
+	function then(?callable $onFulfilled=null, ?callable $onRejected=null): PromiseInterface {
 		$this->checked = true;
 		$next = $this->promise->then($onFulfilled, $onRejected);
 		return ( $this->handler ) ? new static($next, $this->handler) : $next;
 	}
 
 	# The rest of the interface is trivial delegation to this or this->promise:
-	function otherwise(callable $onRejected) { return $this->then(null, $onRejected); }
-	function getState() { return $this->promise->getState(); }
-	function resolve($value) { $this->promise->resolve($value); }
-	function reject($reason) {  $this->promise->reject($reason); }
-	function cancel() { $this->promise-cancel(); }
+	function otherwise(callable $onRejected): PromiseInterface { return $this->then(null, $onRejected); }
+	function getState(): string { return $this->promise->getState(); }
+	function resolve($value): void { $this->promise->resolve($value); }
+	function reject($reason): void {  $this->promise->reject($reason); }
+	function cancel(): void { $this->promise->cancel(); }
 }
