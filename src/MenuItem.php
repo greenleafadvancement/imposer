@@ -62,7 +62,7 @@ class MenuItem {
 		$this->object = $post_obj ? $post_obj->post_type : 'post';
 		$this->object_id = $post;
 		$this->type = 'post_type';
-		yield get($item->id, "page:$post_type:$post");
+		yield get($item->id, "page:{$this->object}:$post");
 	}
 
 	protected function archive($archive_type, $item) {
