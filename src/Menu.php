@@ -22,8 +22,8 @@ class Menu {
 			if ( is_array($data) ) $data = (object) array('items'=>$data);
 
 			$menu = new Menu(
-				get($old->term_id, 0), $name,
-				get($data->description, get($old->description, '')),
+				$old ? get($old->term_id, 0) : 0, $name,
+				get($data->description, $old ? get($old->description, '') : ''),
 				get($data->items, null)
 			);
 			yield $menu->sync($old, get($data->location, null));
