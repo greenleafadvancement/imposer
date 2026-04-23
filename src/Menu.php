@@ -38,7 +38,7 @@ class Menu {
 	}
 
 	function sync($old, $locations) {
-		if ( $this->term_id === 0 || $this->description != $old->description ) {
+		if ( $this->term_id === 0 || ($old && $this->description != $old->description) ) {
 			$id = wp_update_nav_menu_object(
 				$this->term_id, wp_slash(
 					array('menu-name'=>$this->name, 'description'=>$this->description)
