@@ -20,6 +20,7 @@ class Menu {
 			$old = aget($oldMenus, $name, null);
 			// If the menu is just a list, treat it as items w/no desc or loc
 			if ( is_array($data) ) $data = (object) array('items'=>$data);
+			if ( $data === null ) $data = (object) array('items'=>array());
 
 			$menu = new Menu(
 				$old ? get($old->term_id, 0) : 0, $name,
