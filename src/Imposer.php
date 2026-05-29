@@ -154,7 +154,17 @@ class Imposer {
 			$plugin_files = array_column( $fetcher->get_many(array_keys($plugins)), 'file', 'name' );
 			$activate = $deactivate = array();
 			foreach ($plugins as $plugin => $desired) {
-				$desired = ($desired !== false);
+				# Per spec, boolean `false` means "deactivate" and `true`/`null`
+				# mean "activate". Some state generators emit human-readable
+				# strings instead of booleans (e.g. `plugin: inactive`); treat the
+				# common deactivate spellings as `false` so a string `"inactive"`
+				# is not misread as truthy (which would re-activate the plugin and,
+				# for plugins that self-deactivate, loop the apply forever).
+				if ( is_string($desired) ) {
+					$desired = ! in_array( strtolower(trim($desired)), array('', '0', 'false', 'inactive', 'off', 'no'), true );
+				} else {
+					$desired = ($desired !== false);
+				}
 				if ( empty($plugin_files[$plugin]) ) {
 					if ( $desired ) WP_CLI::error("Plugin '$plugin' not found");
 					else WP_CLI::debug("Skipping deactivation of unknown plugin '$plugin'", 'imposer');
